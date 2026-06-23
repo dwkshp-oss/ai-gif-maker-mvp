@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: ai-gif-maker-mvp
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /healthz
+    envVars:
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: GENERATED_DIR
+        value: generated
+      - key: DEFAULT_STYLE
+        value: cute3d
+      - key: DEFAULT_RATIO
+        value: 9:16
+      - key: RATE_LIMIT_COUNT
+        value: "10"
+      - key: RATE_LIMIT_WINDOW_SECONDS
+        value: "60"
+      - key: GIF_DURATION_SECONDS
+        value: "3"
+      - key: FRAME_DURATION_MS
+        value: "120"
+      - key: POLLINATIONS_ENABLED
+        value: "1"
+      - key: POLLINATIONS_MODEL
+        value: flux
+      - key: POLLINATIONS_TIMEOUT_SECONDS
+        value: "90"
+      - key: OPENAI_IMAGE_ENABLED
+        value: "0"
+      - key: DOWNLOAD_TO_SERVER_ENABLED
+        value: "0"

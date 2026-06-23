@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI GIF Maker MVP</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body data-server-save-enabled="{{ '1' if download_to_server_enabled else '0' }}">
+  <main class="page">
+    <section class="hero">
+      <div class="badge">MVP</div>
+      <h1>짧은 문장으로<br />3초 GIF 만들기</h1>
+      <p>한글 입력을 영어 이미지 지시문으로 바꾼 뒤, 무료 이미지 API로 GIF를 생성합니다.</p>
+    </section>
+
+    <section class="workspace">
+      <form class="panel controls" id="generateForm">
+        <label for="prompt">원하는 GIF 설명</label>
+        <textarea id="prompt" name="prompt" maxlength="300" placeholder="예: 귀여운 거북이가 커피잔 옆에서 춤추는 3D GIF" required></textarea>
+
+        <button id="translateBtn" class="secondary-button" type="button">영어 지시문 만들기</button>
+
+        <label for="englishPrompt">이미지 생성에 보낼 영어 지시문</label>
+        <textarea id="englishPrompt" name="englishPrompt" maxlength="600" placeholder="한글 설명을 입력한 뒤 영어 지시문 만들기를 누르세요. 필요하면 여기서 직접 수정할 수 있습니다."></textarea>
+
+        <div class="field-grid">
+          <div>
+            <label for="style">스타일</label>
+            <select id="style" name="style">
+              {% for key, item in styles.items() %}
+                <option value="{{ key }}">{{ item.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="ratio">비율</label>
+            <select id="ratio" name="ratio">
+              {% for key, label in ratios.items() %}
+                <option value="{{ key }}" {% if key == default_ratio %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <button id="generateBtn" type="submit">GIF 생성</button>
+        <p id="status" role="status" aria-live="polite"></p>
+      </form>
+
+      <section class="panel preview" aria-live="polite">
+        <div class="preview-empty" id="emptyState">생성 결과가 여기에 표시됩니다.</div>
+        <img id="gifPreview" class="hidden" alt="생성된 GIF 미리보기" />
+        <a id="directDownloadLink" class="download hidden" href="#" download>GIF 다운로드</a>
+        <button id="saveBtn" class="secondary-button hidden" type="button">서버 폴더에 저장</button>
+        <p id="savePath" class="save-path hidden"></p>
+        <dl class="metadata hidden" id="metadata">
+          <div>
+            <dt>길이</dt>
+            <dd id="durationMeta">-</dd>
+          </div>
+          <div>
+            <dt>프레임</dt>
+            <dd id="frameMeta">-</dd>
+          </div>
+          <div>
+            <dt>생성기</dt>
+            <dd id="providerMeta">-</dd>
+          </div>
+        </dl>
+      </section>
+    </section>
+  </main>
+  <script src="/static/js/app.js?v=20260623-render-ready"></script>
+</body>
+</html>
