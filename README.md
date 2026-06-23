@@ -43,7 +43,7 @@ Render 설정값:
 
 ```text
 Build Command: pip install -r requirements.txt
-Start Command: gunicorn app:app
+Start Command: gunicorn --timeout 180 app:app
 Health Check Path: /healthz
 ```
 

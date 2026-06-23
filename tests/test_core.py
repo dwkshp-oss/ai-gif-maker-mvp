@@ -123,6 +123,14 @@ class CoreTests(unittest.TestCase):
         self.assertIn("a cute turtle as the main subject with a visible shell", hints)
         self.assertIn("do not replace it with a cat", prompt)
 
+    def test_cherry_blossom_prompt_excludes_random_animals(self):
+        normalized = normalize_prompt_for_image_model("벛꽃이 휘날리는 GIF")
+        hints = extract_scene_hints("벛꽃이 휘날리는 GIF")
+        prompt = build_image_prompt(build_generation_request("벛꽃이 휘날리는 GIF", "cute3d", "9:16"))
+        self.assertIn("cherry blossom petals", normalized)
+        self.assertTrue(any("pink cherry blossom trees and petals" in hint for hint in hints))
+        self.assertIn("No cats, no dogs, no animals", prompt)
+
 
 if __name__ == "__main__":
     unittest.main()

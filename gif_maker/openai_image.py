@@ -77,12 +77,14 @@ def build_image_prompt(request: GenerationRequest) -> str:
     english_scene = normalize_prompt_for_image_model(request.prompt)
     scene_hints = extract_scene_hints(request.prompt)
     hint_sentence = ", ".join(scene_hints) if scene_hints else "follow the user's exact subject and action"
+    exclusion_sentence = build_exclusion_sentence(english_scene, request.prompt)
 
     return (
         "Create ONE image that faithfully depicts this exact visual scene. "
         f"Primary English scene description: {english_scene}. "
         f"Original user request for reference only: {request.prompt}. "
         f"Required visible elements: {hint_sentence}. "
+        f"{exclusion_sentence} "
         f"Visual style: {theme}. Composition: {aspect}. "
         "The generated image must match the primary English scene description. "
         "If a specific animal is requested, draw that exact animal species and do not replace it with a cat, dog, or person. "
@@ -103,6 +105,8 @@ def normalize_prompt_for_image_model(prompt: str) -> str:
         (("커피잔", "커피 컵", "커피", "카페"), "a clearly visible coffee cup"),
         (("아이디어", "영감"), "a glowing idea light bulb above the main subject"),
         (("반짝", "빛나는", "빛", "스파클"), "sparkling light particles"),
+        (("벚꽃", "벛꽃", "벚꽃잎", "벛꽃잎", "cherry blossom", "sakura"), "pink cherry blossom petals blowing in the wind"),
+        (("꽃잎", "꽃잎이", "petal", "petals"), "flower petals floating through the air"),
         (("강아지", "개", " puppy", "dog"), "a cute dog"),
         (("고양이", " cat", "kitten"), "a cute cat"),
         (("거북이", "거북", "turtle", "tortoise"), "a cute turtle with a visible shell"),
@@ -169,6 +173,8 @@ def extract_scene_hints(prompt: str) -> list[str]:
         (("회의", "office", "business", "사무실", "회사"), "a modern business office setting"),
         (("바다", "beach", "ocean", "해변"), "a beach or ocean background"),
         (("산", "mountain"), "a mountain landscape background"),
+        (("벚꽃", "벛꽃", "cherry blossom", "sakura"), "pink cherry blossom trees and petals blowing in the wind"),
+        (("꽃잎", "petal", "petals"), "visible flower petals floating through the air"),
         (("비행기", "flight", "airplane", "여행"), "an airplane or travel motif"),
         (("피자", "pizza"), "a pizza as the main food object"),
         (("케이크", "cake"), "a cake as the main food object"),
@@ -179,6 +185,49 @@ def extract_scene_hints(prompt: str) -> list[str]:
         if any(keyword in lowered for keyword in keywords):
             hints.append(hint)
     return hints[:7]
+
+
+def build_exclusion_sentence(*texts: str) -> str:
+    joined = " ".join(texts).lower()
+    if has_requested_animal(joined) or has_requested_person(joined):
+        return "Do not add unrelated animals, people, or extra characters."
+    return "No cats, no dogs, no animals, no people, no characters; only the requested scene elements."
+
+
+def has_requested_animal(text: str) -> bool:
+    korean_animal_keywords = (
+        "고양이",
+        "강아지",
+        "거북이",
+        "거북",
+        "토끼",
+        "새",
+        "햄스터",
+        "펭귄",
+        "반려동물",
+    )
+    english_animal_keywords = (
+        "cat",
+        "kitten",
+        "dog",
+        "puppy",
+        "turtle",
+        "tortoise",
+        "rabbit",
+        "bunny",
+        "bird",
+        "hamster",
+        "penguin",
+        "pet",
+    )
+    return any(keyword in text for keyword in korean_animal_keywords) or any(
+        re.search(rf"\b{re.escape(keyword)}\b", text) for keyword in english_animal_keywords
+    )
+
+
+def has_requested_person(text: str) -> bool:
+    person_keywords = ("사람", "인물", "남자", "여자", "아이", "person", "people", "man", "woman", "child")
+    return any(keyword in text for keyword in person_keywords)
 
 
 def contains_hangul(text: str) -> bool:
