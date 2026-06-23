@@ -15,6 +15,7 @@ const frameMeta = document.getElementById("frameMeta");
 const providerMeta = document.getElementById("providerMeta");
 const serverSaveEnabled = document.body.dataset.serverSaveEnabled === "1";
 let currentFile = null;
+let lastTranslatedSourcePrompt = "";
 
 function setLoading(isLoading) {
   btn.disabled = isLoading;
@@ -43,7 +44,7 @@ async function translatePromptIfNeeded(force = false) {
     showStatus("먼저 원하는 GIF 설명을 입력해 주세요.", true);
     return "";
   }
-  if (!force && englishPromptEl.value.trim()) {
+  if (!force && englishPromptEl.value.trim() && lastTranslatedSourcePrompt === prompt) {
     return englishPromptEl.value.trim();
   }
 
@@ -58,9 +59,21 @@ async function translatePromptIfNeeded(force = false) {
     throw new Error(data.message || "영어 지시문 생성에 실패했습니다.");
   }
   englishPromptEl.value = data.englishPrompt;
+  lastTranslatedSourcePrompt = prompt;
   showStatus("영어 지시문을 만들었습니다. 내용이 맞는지 확인한 뒤 생성하세요.");
   return data.englishPrompt;
 }
+
+promptEl.addEventListener("input", () => {
+  if (lastTranslatedSourcePrompt && promptEl.value.trim() !== lastTranslatedSourcePrompt) {
+    englishPromptEl.value = "";
+    lastTranslatedSourcePrompt = "";
+  }
+});
+
+englishPromptEl.addEventListener("input", () => {
+  lastTranslatedSourcePrompt = englishPromptEl.value.trim() ? promptEl.value.trim() : "";
+});
 
 function showPreview(data) {
   currentFile = {
