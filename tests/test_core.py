@@ -54,11 +54,16 @@ class CoreTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertTrue(data["ok"])
             self.assertEqual(data["metadata"]["provider"], "local-pillow-demo")
+            self.assertIn("/view/", data["viewUrl"])
 
             save_response = client.post("/api/save-to-downloads", json={"filename": data["filename"]})
             save_data = save_response.get_json()
             self.assertEqual(save_response.status_code, 200)
             self.assertTrue(Path(save_data["path"]).exists())
+
+            view_response = client.get(data["viewUrl"])
+            self.assertEqual(view_response.status_code, 200)
+            self.assertIn("GIF 다운로드", view_response.get_data(as_text=True))
 
     def test_generate_rejects_korean_prompt_in_english_only_mode(self):
         with tempfile.TemporaryDirectory() as tmp:

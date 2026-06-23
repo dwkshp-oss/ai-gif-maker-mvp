@@ -108,6 +108,7 @@ def create_app(config: AppConfig | None = None) -> Flask:
                 "ok": True,
                 "url": storage.public_url(filename),
                 "downloadUrl": f"/download/{filename}",
+                "viewUrl": f"/view/{filename}",
                 "saveUrl": "/api/save-to-downloads",
                 "filename": filename,
                 "downloadToServerEnabled": config.download_to_server_enabled,
@@ -152,6 +153,18 @@ def create_app(config: AppConfig | None = None) -> Flask:
     @app.get("/generated/<filename>")
     def generated_file(filename):
         return send_from_directory(storage.output_dir, filename)
+
+    @app.get("/view/<filename>")
+    def view_generated(filename):
+        path = storage.path_for(filename)
+        if not path.exists():
+            return jsonify({"ok": False, "message": "GIF 파일을 찾을 수 없습니다."}), 404
+        return render_template(
+            "view.html",
+            filename=filename,
+            image_url=storage.public_url(filename),
+            download_url=f"/download/{filename}",
+        )
 
     @app.get("/download/<filename>")
     def download(filename):

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Generated GIF</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <main class="page mobile-view">
+    <section class="panel preview">
+      <h1 class="view-title">생성된 GIF</h1>
+      <p class="view-help">휴대폰에서 다운로드가 안 되면 GIF를 길게 눌러 이미지로 저장하세요.</p>
+      <img src="{{ image_url }}" alt="생성된 GIF" />
+      <a class="download" href="{{ download_url }}">GIF 다운로드</a>
+      <a class="secondary-link" href="{{ image_url }}" target="_blank" rel="noopener">GIF만 새 창에서 열기</a>
+    </section>
+  </main>
+</body>
+</html>

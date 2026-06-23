@@ -6,6 +6,7 @@ const emptyState = document.getElementById("emptyState");
 const gifPreview = document.getElementById("gifPreview");
 const saveBtn = document.getElementById("saveBtn");
 const directDownloadLink = document.getElementById("directDownloadLink");
+const openGifLink = document.getElementById("openGifLink");
 const savePath = document.getElementById("savePath");
 const metadata = document.getElementById("metadata");
 const durationMeta = document.getElementById("durationMeta");
@@ -29,6 +30,7 @@ function resetPreview() {
   emptyState.classList.remove("hidden");
   gifPreview.classList.add("hidden");
   directDownloadLink.classList.add("hidden");
+  openGifLink.classList.add("hidden");
   saveBtn.classList.add("hidden");
   savePath.classList.add("hidden");
   metadata.classList.add("hidden");
@@ -42,6 +44,7 @@ function showPreview(data) {
   currentFile = {
     filename: data.filename,
     downloadUrl: data.downloadUrl,
+    viewUrl: data.viewUrl,
     saveUrl: data.saveUrl,
   };
 
@@ -52,6 +55,9 @@ function showPreview(data) {
   directDownloadLink.href = `${data.downloadUrl}?t=${Date.now()}`;
   directDownloadLink.download = data.filename;
   directDownloadLink.classList.remove("hidden");
+
+  openGifLink.href = data.viewUrl || data.url;
+  openGifLink.classList.remove("hidden");
 
   if (serverSaveEnabled && data.downloadToServerEnabled) {
     saveBtn.classList.remove("hidden");
@@ -124,7 +130,7 @@ form.addEventListener("submit", async (event) => {
     }
 
     showPreview(data);
-    showStatus("GIF 생성이 완료되었습니다. GIF 다운로드 버튼으로 저장하세요.");
+    showStatus("GIF 생성이 완료되었습니다. 휴대폰에서는 '모바일에서 GIF 열기/저장'을 눌러 저장하세요.");
   } catch (err) {
     showStatus(err.message || "오류가 발생했습니다. 다시 시도해 주세요.", true);
   } finally {

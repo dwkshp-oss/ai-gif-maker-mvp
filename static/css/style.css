@@ -161,6 +161,22 @@ button:disabled {
   color: #172033;
 }
 
+.mobile-view {
+  max-width: 520px;
+}
+
+.view-title {
+  font-size: 30px;
+  line-height: 1.2;
+  margin: 0 0 10px;
+}
+
+.view-help {
+  margin: 0 0 18px;
+  color: #536079;
+  line-height: 1.55;
+}
+
 .save-path {
   word-break: break-all;
   text-align: left;
