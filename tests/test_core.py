@@ -60,6 +60,27 @@ class CoreTests(unittest.TestCase):
             self.assertEqual(save_response.status_code, 200)
             self.assertTrue(Path(save_data["path"]).exists())
 
+    def test_generate_rejects_korean_prompt_in_english_only_mode(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            app = create_app(
+                AppConfig(
+                    generated_dir=base / "generated",
+                    download_dir=base / "downloads",
+                    pollinations_enabled=False,
+                    openai_image_enabled=False,
+                )
+            )
+            client = app.test_client()
+            response = client.post(
+                "/api/generate",
+                json={"prompt": "벚꽃이 휘날리는 GIF", "style": "cute3d", "ratio": "9:16"},
+            )
+            data = response.get_json()
+            self.assertEqual(response.status_code, 400)
+            self.assertFalse(data["ok"])
+            self.assertEqual(data["error"], "ENGLISH_ONLY")
+
     def test_translate_prompt_endpoint(self):
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)

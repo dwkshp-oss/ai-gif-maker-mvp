@@ -11,18 +11,13 @@
     <section class="hero">
       <div class="badge">MVP</div>
       <h1>짧은 문장으로<br />3초 GIF 만들기</h1>
-      <p>한글 입력을 영어 이미지 지시문으로 바꾼 뒤, 무료 이미지 API로 GIF를 생성합니다.</p>
+      <p>현재 테스트 버전은 영어 프롬프트만 입력해서 무료 이미지 API로 GIF를 생성합니다.</p>
     </section>
 
     <section class="workspace">
       <form class="panel controls" id="generateForm">
-        <label for="prompt">원하는 GIF 설명</label>
-        <textarea id="prompt" name="prompt" maxlength="300" placeholder="예: 귀여운 거북이가 커피잔 옆에서 춤추는 3D GIF" required></textarea>
-
-        <button id="translateBtn" class="secondary-button" type="button">영어 지시문 만들기</button>
-
-        <label for="englishPrompt">이미지 생성에 보낼 영어 지시문</label>
-        <textarea id="englishPrompt" name="englishPrompt" maxlength="600" placeholder="한글 설명을 입력한 뒤 영어 지시문 만들기를 누르세요. 필요하면 여기서 직접 수정할 수 있습니다."></textarea>
+        <label for="prompt">English prompt</label>
+        <textarea id="prompt" name="prompt" maxlength="600" placeholder="Example: pink cherry blossom petals blowing in the wind, clean composition, high quality" required></textarea>
 
         <div class="field-grid">
           <div>
@@ -70,6 +65,6 @@
       </section>
     </section>
   </main>
-  <script src="/static/js/app.js?v=20260623-translate-refresh"></script>
+  <script src="/static/js/app.js?v=20260623-english-only"></script>
 </body>
 </html>

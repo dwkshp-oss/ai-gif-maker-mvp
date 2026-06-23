@@ -1,9 +1,7 @@
 const form = document.getElementById("generateForm");
 const btn = document.getElementById("generateBtn");
-const translateBtn = document.getElementById("translateBtn");
 const statusEl = document.getElementById("status");
 const promptEl = document.getElementById("prompt");
-const englishPromptEl = document.getElementById("englishPrompt");
 const emptyState = document.getElementById("emptyState");
 const gifPreview = document.getElementById("gifPreview");
 const saveBtn = document.getElementById("saveBtn");
@@ -15,11 +13,9 @@ const frameMeta = document.getElementById("frameMeta");
 const providerMeta = document.getElementById("providerMeta");
 const serverSaveEnabled = document.body.dataset.serverSaveEnabled === "1";
 let currentFile = null;
-let lastTranslatedSourcePrompt = "";
 
 function setLoading(isLoading) {
   btn.disabled = isLoading;
-  translateBtn.disabled = isLoading;
   btn.textContent = isLoading ? "생성 중..." : "GIF 생성";
 }
 
@@ -38,42 +34,9 @@ function resetPreview() {
   metadata.classList.add("hidden");
 }
 
-async function translatePromptIfNeeded(force = false) {
-  const prompt = promptEl.value.trim();
-  if (!prompt) {
-    showStatus("먼저 원하는 GIF 설명을 입력해 주세요.", true);
-    return "";
-  }
-  if (!force && englishPromptEl.value.trim() && lastTranslatedSourcePrompt === prompt) {
-    return englishPromptEl.value.trim();
-  }
-
-  showStatus("한글 설명을 영어 이미지 지시문으로 바꾸는 중입니다.");
-  const res = await fetch("/api/translate-prompt", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt }),
-  });
-  const data = await res.json();
-  if (!res.ok || !data.ok) {
-    throw new Error(data.message || "영어 지시문 생성에 실패했습니다.");
-  }
-  englishPromptEl.value = data.englishPrompt;
-  lastTranslatedSourcePrompt = prompt;
-  showStatus("영어 지시문을 만들었습니다. 내용이 맞는지 확인한 뒤 생성하세요.");
-  return data.englishPrompt;
+function containsKorean(text) {
+  return /[가-힣]/.test(text);
 }
-
-promptEl.addEventListener("input", () => {
-  if (lastTranslatedSourcePrompt && promptEl.value.trim() !== lastTranslatedSourcePrompt) {
-    englishPromptEl.value = "";
-    lastTranslatedSourcePrompt = "";
-  }
-});
-
-englishPromptEl.addEventListener("input", () => {
-  lastTranslatedSourcePrompt = englishPromptEl.value.trim() ? promptEl.value.trim() : "";
-});
 
 function showPreview(data) {
   currentFile = {
@@ -101,14 +64,6 @@ function showPreview(data) {
     : data.metadata.provider;
   metadata.classList.remove("hidden");
 }
-
-translateBtn.addEventListener("click", async () => {
-  try {
-    await translatePromptIfNeeded(true);
-  } catch (err) {
-    showStatus(err.message || "영어 지시문 생성 중 오류가 발생했습니다.", true);
-  }
-});
 
 saveBtn.addEventListener("click", async () => {
   if (!currentFile) return;
@@ -144,7 +99,12 @@ form.addEventListener("submit", async (event) => {
   const ratio = document.getElementById("ratio").value;
 
   if (!prompt) {
-    showStatus("먼저 원하는 GIF 설명을 입력해 주세요.", true);
+    showStatus("먼저 영어 프롬프트를 입력해 주세요.", true);
+    return;
+  }
+
+  if (containsKorean(prompt)) {
+    showStatus("현재 테스트 버전은 영어만 지원합니다. 예: cherry blossom petals blowing in the wind", true);
     return;
   }
 
@@ -152,12 +112,11 @@ form.addEventListener("submit", async (event) => {
   resetPreview();
 
   try {
-    const englishPrompt = await translatePromptIfNeeded(false);
     showStatus("GIF 생성을 시작합니다.");
     const res = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, englishPrompt, style, ratio }),
+      body: JSON.stringify({ prompt, style, ratio }),
     });
     const data = await res.json();
     if (!res.ok || !data.ok) {

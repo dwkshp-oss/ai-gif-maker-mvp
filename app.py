@@ -6,6 +6,7 @@ from gif_maker.moderation import ModerationError, validate_prompt
 from gif_maker.openai_image import (
     OpenAIImageFrameGenerator,
     OpenAIImageGenerationError,
+    contains_hangul,
     normalize_prompt_for_image_model,
 )
 from gif_maker.pollinations_image import PollinationsFrameGenerator, PollinationsImageGenerationError
@@ -71,6 +72,15 @@ def create_app(config: AppConfig | None = None) -> Flask:
         data = request.get_json(silent=True) or {}
         source_prompt = str(data.get("prompt", "")).strip()
         image_prompt = str(data.get("englishPrompt", "")).strip() or source_prompt
+
+        if contains_hangul(image_prompt) or contains_hangul(source_prompt):
+            return jsonify(
+                {
+                    "ok": False,
+                    "error": "ENGLISH_ONLY",
+                    "message": "현재 테스트 버전은 영어 프롬프트만 지원합니다. 예: cherry blossom petals blowing in the wind",
+                }
+            ), 400
 
         try:
             generation_request = build_generation_request(
