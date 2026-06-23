@@ -12,7 +12,7 @@ class AppConfig:
     host: str = "127.0.0.1"
     port: int = 5000
     debug: bool = False
-    default_style: str = "cute3d"
+    default_style: str = "flat2d"
     default_ratio: str = "9:16"
     gif_duration_seconds: int = 3
     frame_duration_ms: int = 120
@@ -38,7 +38,7 @@ class AppConfig:
             host=os.getenv("FLASK_RUN_HOST", "127.0.0.1"),
             port=int(os.getenv("PORT", "5000")),
             debug=os.getenv("FLASK_DEBUG", "0").lower() in {"1", "true", "yes"},
-            default_style=os.getenv("DEFAULT_STYLE", "cute3d"),
+            default_style=os.getenv("DEFAULT_STYLE", "flat2d"),
             default_ratio=os.getenv("DEFAULT_RATIO", "9:16"),
             gif_duration_seconds=int(os.getenv("GIF_DURATION_SECONDS", "3")),
             frame_duration_ms=int(os.getenv("FRAME_DURATION_MS", "120")),

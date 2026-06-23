@@ -69,6 +69,7 @@ class OpenAIImageFrameGenerator:
 
 def build_image_prompt(request: GenerationRequest) -> str:
     theme = STYLE_THEMES[request.style]["label"]
+    style_instruction = image_style_instruction(request.style, theme)
     aspect = {
         "9:16": "vertical 9:16 short-form social media composition",
         "1:1": "square social media composition",
@@ -85,13 +86,30 @@ def build_image_prompt(request: GenerationRequest) -> str:
         f"Original user request for reference only: {request.prompt}. "
         f"Required visible elements: {hint_sentence}. "
         f"{exclusion_sentence} "
-        f"Visual style: {theme}. Composition: {aspect}. "
+        f"Visual style: {style_instruction}. Composition: {aspect}. "
         "The generated image must match the primary English scene description. "
         "If a specific animal is requested, draw that exact animal species and do not replace it with a cat, dog, or person. "
         "Prioritize the exact subject, object, action, and setting over generic style. "
         "Do not invent unrelated characters or objects. "
         "No text, no captions, no watermark, no UI, no logo, no extra symbols."
     )
+
+
+def image_style_instruction(style: str, theme_label: str) -> str:
+    if style == "flat2d":
+        return (
+            "clean flat 2D illustration, simple vector cartoon style, bold readable shapes, "
+            "smooth cel animation look, bright colors, no 3D render, no photorealism, no realistic photo texture"
+        )
+    if style == "cute3d":
+        return "cute soft 3D rendered style, rounded shapes, playful lighting"
+    if style == "meme":
+        return "simple meme-style illustration, expressive, bold composition"
+    if style == "business":
+        return "clean business presentation illustration, polished and simple"
+    if style == "pet":
+        return "cute pet illustration, friendly and warm"
+    return theme_label
 
 
 def normalize_prompt_for_image_model(prompt: str) -> str:

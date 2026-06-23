@@ -23,6 +23,13 @@ class CoreTests(unittest.TestCase):
         request = build_generation_request("product intro", "business", "9:16")
         self.assertEqual(request.style, "business")
 
+    def test_flat_2d_style_prompt(self):
+        request = build_generation_request("cherry blossom petals blowing in the wind", "flat2d", "9:16")
+        prompt = build_image_prompt(request)
+        self.assertEqual(request.style, "flat2d")
+        self.assertIn("flat 2D illustration", prompt)
+        self.assertIn("no 3D render", prompt)
+
     def test_prompt_moderation(self):
         with self.assertRaises(ModerationError):
             validate_prompt("explicit scene")

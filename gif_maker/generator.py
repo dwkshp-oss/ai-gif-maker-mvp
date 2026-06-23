@@ -7,6 +7,11 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 
 STYLE_THEMES = {
+    "flat2d": {
+        "label": "2D 일러스트",
+        "bg": [(250, 252, 255), (230, 246, 255)],
+        "accent": (22, 101, 132),
+    },
     "cute3d": {
         "label": "귀여운 3D",
         "bg": [(255, 242, 210), (255, 210, 228)],
@@ -123,6 +128,8 @@ def plan_scene(prompt: str, style: str) -> ScenePlan:
         return scene_plan_for("business")
     if style == "meme":
         return ScenePlan("meme", "Meme reaction", (20, 20, 20))
+    if style == "flat2d":
+        return ScenePlan("idea", "2D motion", (22, 101, 132), has_spark=True)
     return ScenePlan("idea", "Spark idea", (255, 190, 60), has_spark=True)
 
 
